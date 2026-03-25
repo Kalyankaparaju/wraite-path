@@ -3,15 +3,15 @@ import { supabase } from "@/lib/supabase";
 
 export async function DELETE(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ projectId: string }> }
 ) {
   try {
-    const { id } = await context.params;
+    const { projectId } = await context.params;
 
     const { error } = await supabase
       .from("ideas")
       .delete()
-      .eq("id", id);
+      .eq("id", projectId);
 
     if (error) {
       return NextResponse.json(
@@ -34,10 +34,10 @@ export async function DELETE(
 
 export async function PUT(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ projectId: string }> }
 ) {
   try {
-    const { id } = await context.params;
+    const { projectId } = await context.params;
 
     const body = await req.json();
     const { status } = body;
@@ -45,7 +45,7 @@ export async function PUT(
     const { data, error } = await supabase
       .from("ideas")
       .update({ status })
-      .eq("id", id)
+      .eq("id", projectId)
       .select()
       .single();
 

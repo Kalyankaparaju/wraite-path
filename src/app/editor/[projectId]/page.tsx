@@ -510,7 +510,9 @@ export default function EditorPage() {
                 messages.map((m: any) => (
                   <div key={m.id} className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
                     <div className={`max-w-[85%] rounded-2xl px-4 py-3 ${m.role === 'user' ? 'bg-brand-base/20 text-brand-light border border-brand-base/30 rounded-tr-sm' : 'bg-white/5 text-gray-300 border border-white/10 rounded-tl-sm'}`}>
-                      <ReactMarkdown className="prose prose-invert prose-sm max-w-none">{m.content}</ReactMarkdown>
+                      <div className="prose prose-invert prose-sm max-w-none">
+                        <ReactMarkdown>{m.content}</ReactMarkdown>
+                      </div>
                     </div>
                   </div>
                 ))

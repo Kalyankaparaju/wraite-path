@@ -1,13 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
+/**
+ * POST → Generate or fetch lore
+ */
+export async function POST(
+  req: NextRequest,
+  context: { params: Promise<{ charId: string }> }
+) {
+  const { charId } = await context.params;
+
+  try {
+    // Example placeholder response
+    return NextResponse.json({
+      lore: `Generated lore for character ${charId}`,
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Unknown error";
+
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+/**
+ * PUT → Update lore / portrait
+ */
 export async function PUT(
   req: NextRequest,
   context: { params: Promise<{ charId: string }> }
 ) {
-  try {
-    const { charId } = await context.params;
+  const { charId } = await context.params;
 
+  try {
     const body = await req.json();
     const { lore, portrait_url } = body;
 
@@ -35,9 +60,6 @@ export async function PUT(
     const message =
       error instanceof Error ? error.message : "Unknown error";
 
-    return NextResponse.json(
-      { error: message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

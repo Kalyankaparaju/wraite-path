@@ -1,13 +1,18 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
-export async function PUT(req: Request, { params }: { params: { charId: string } }) {
+export async function PUT(
+  req: NextRequest,
+  context: { params: Promise<{ charId: string }> }
+) {
   try {
-    const { charId } = await params;
+    const { charId } = await context.params;
+
     const body = await req.json();
     const { lore, portrait_url } = body;
 
-    const updates: any = {};
+    const updates: Record<string, any> = {};
+
     if (lore !== undefined) updates.lore = lore;
     if (portrait_url !== undefined) updates.portrait_url = portrait_url;
 
@@ -18,9 +23,21 @@ export async function PUT(req: Request, { params }: { params: { charId: string }
       .select()
       .single();
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Unknown error";
+
+    return NextResponse.json(
+      { error: message },
+      { status: 500 }
+    );
   }
 }

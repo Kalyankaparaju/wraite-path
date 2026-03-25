@@ -17,10 +17,7 @@ export async function PUT(
       .single();
 
     if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ data });
@@ -28,10 +25,7 @@ export async function PUT(
     const message =
       error instanceof Error ? error.message : "Unknown error";
 
-    return NextResponse.json(
-      { error: message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -48,10 +42,7 @@ export async function DELETE(
       .eq("id", sceneId);
 
     if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
@@ -59,9 +50,6 @@ export async function DELETE(
     const message =
       error instanceof Error ? error.message : "Unknown error";
 
-    return NextResponse.json(
-      { error: message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

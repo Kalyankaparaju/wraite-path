@@ -28,7 +28,7 @@ export default function DashboardPage() {
   const handleDelete = async (e: React.MouseEvent, projectId: string) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!window.confirm("Are you sure you want to delete this project? This action cannot be undone.")) {
       return;
     }
@@ -56,7 +56,7 @@ export default function DashboardPage() {
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+    show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
   };
 
   return (
@@ -66,7 +66,7 @@ export default function DashboardPage() {
       <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-purple-600/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto space-y-12 relative z-10 pt-10">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -93,7 +93,7 @@ export default function DashboardPage() {
             <Loader2 className="w-10 h-10 animate-spin text-brand-light" />
           </div>
         ) : projects.length === 0 ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="border border-dashed border-white/10 rounded-3xl p-16 text-center text-gray-500 flex flex-col items-center bg-surface/30 backdrop-blur-sm"
@@ -111,7 +111,7 @@ export default function DashboardPage() {
             </Link>
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="show"
@@ -119,7 +119,7 @@ export default function DashboardPage() {
           >
             {projects.map((project) => (
               <motion.div key={project.id} variants={itemVariants}>
-                <Link 
+                <Link
                   href={`/editor/${project.id}`}
                   className="group block h-full bg-surface/50 backdrop-blur-xl border border-white/5 rounded-2xl p-6 hover:bg-surface-hover hover:border-brand-base/50 hover:shadow-[0_8px_30px_rgba(99,102,241,0.15)] transition-all duration-300 transform hover:-translate-y-1"
                 >
@@ -136,11 +136,11 @@ export default function DashboardPage() {
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
-                    
+
                     <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 leading-tight">
                       {project.title}
                     </h3>
-                    
+
                     <div className="inline-flex items-center gap-2 mb-6 text-xs font-semibold px-2.5 py-1 bg-black/40 border border-white/5 rounded-md w-fit text-brand-light/90">
                       {project.template}
                     </div>

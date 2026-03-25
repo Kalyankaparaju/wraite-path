@@ -12,7 +12,7 @@ export default function NewProjectPage() {
   const formatRawScriptToTipTap = (rawText: string) => {
     const lines = rawText.split('\n');
     const nodes: string[] = [];
-    
+
     let lastType = 'action';
 
     for (let i = 0; i < lines.length; i++) {
@@ -88,7 +88,7 @@ export default function NewProjectPage() {
     language: "English",
     synopsis: "",
   });
-  
+
   const [initialScript, setInitialScript] = useState<string | null>(null);
   const [uploadName, setUploadName] = useState<string | null>(null);
   const [uploadState, setUploadState] = useState<"none" | "loading" | "success" | "error">("none");
@@ -97,12 +97,12 @@ export default function NewProjectPage() {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     setUploadState("loading");
     setUploadName(file.name);
-    
+
     if (!formData.title) {
-        setFormData(prev => ({ ...prev, title: file.name.replace(/\.[^/.]+$/, "") }));
+      setFormData(prev => ({ ...prev, title: file.name.replace(/\.[^/.]+$/, "") }));
     }
 
     const payload = new FormData();
@@ -111,14 +111,14 @@ export default function NewProjectPage() {
     try {
       const res = await fetch("/api/parse", { method: "POST", body: payload });
       if (!res.ok) {
-         let errorText = await res.text();
-         try {
-           const json = JSON.parse(errorText);
-           errorText = json.error || errorText;
-         } catch(e) {}
-         throw new Error(errorText || "Upload Failed");
+        let errorText = await res.text();
+        try {
+          const json = JSON.parse(errorText);
+          errorText = json.error || errorText;
+        } catch (e) { }
+        throw new Error(errorText || "Upload Failed");
       }
-      
+
       const { text } = await res.json();
       setInitialScript(text);
       setUploadState("success");
@@ -149,13 +149,13 @@ export default function NewProjectPage() {
         for (let i = 0; i < boundaries.length; i++) {
           const curr = boundaries[i];
           const next = boundaries[i + 1];
-          
+
           const startIdx = curr.start_line;
           const endIdx = next ? next.start_line : lines.length;
-          
+
           // Slice the lines array using the exact indexes returned by the LLM
           const contentLines = lines.slice(startIdx, endIdx);
-          
+
           const contentRaw = contentLines.join('\n').trim();
           scenesToInsert.push({
             project_id: projectId,
@@ -196,11 +196,11 @@ export default function NewProjectPage() {
 
       if (!res.ok) throw new Error("Failed to create project");
       const data = await res.json();
-      
+
       if (data) {
         if (initialScript) {
           const scenesToInsert = await parseScriptToScenesAI(initialScript, data.id);
-          
+
           await fetch(`/api/scenes`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -208,33 +208,33 @@ export default function NewProjectPage() {
           });
         } else if (formData.synopsis.trim()) {
           try {
-             // Generate draft scenes using AI
-             const draftRes = await fetch('/api/generate-draft', {
-                 method: 'POST',
-                 headers: { 'Content-Type': 'application/json' },
-                 body: JSON.stringify(formData)
-             });
-             
-             if (draftRes.ok) {
-                 const { scenes } = await draftRes.json();
-                 if (scenes && scenes.length > 0) {
-                     const formattedScenes = scenes.map((s: any) => ({
-                         project_id: data.id,
-                         scene_number: s.scene_number,
-                         location: s.location || "SCENE",
-                         time_of_day: s.time_of_day || "",
-                         synopsis: s.synopsis || "",
-                         content: s.content || ""
-                     }));
-                     await fetch(`/api/scenes`, {
-                         method: "POST",
-                         headers: { "Content-Type": "application/json" },
-                         body: JSON.stringify(formattedScenes)
-                     });
-                 }
-             }
-          } catch(err) {
-              console.error("Drafting failed", err);
+            // Generate draft scenes using AI
+            const draftRes = await fetch('/api/generate-draft', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(formData)
+            });
+
+            if (draftRes.ok) {
+              const { scenes } = await draftRes.json();
+              if (scenes && scenes.length > 0) {
+                const formattedScenes = scenes.map((s: any) => ({
+                  project_id: data.id,
+                  scene_number: s.scene_number,
+                  location: s.location || "SCENE",
+                  time_of_day: s.time_of_day || "",
+                  synopsis: s.synopsis || "",
+                  content: s.content || ""
+                }));
+                await fetch(`/api/scenes`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(formattedScenes)
+                });
+              }
+            }
+          } catch (err) {
+            console.error("Drafting failed", err);
           }
         }
         router.push(`/editor/${data.id}`);
@@ -249,12 +249,12 @@ export default function NewProjectPage() {
 
   const containerVariants: any = {
     hidden: { opacity: 0, y: 30 },
-    show: { opacity: 1, y: 0, transition: { staggerChildren: 0.1, duration: 0.5, ease: "easeOut" as any } }
+    show: { opacity: 1, y: 0, transition: { staggerChildren: 0.1, duration: 0.5, ease: "easeOut" as const } }
   };
-  
+
   const itemVariants: any = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as any } }
+    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } }
   };
 
   return (
@@ -263,7 +263,7 @@ export default function NewProjectPage() {
       <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-brand-base/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[150px] -z-10 pointer-events-none" />
 
-      <motion.div 
+      <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="show"
@@ -272,56 +272,56 @@ export default function NewProjectPage() {
         <motion.h1 variants={itemVariants} className="text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
           Create New Project
         </motion.h1>
-        
+
         {/* Document Upload Section */}
         <motion.div variants={itemVariants} className="mb-8 bg-black/20 border border-white/10 rounded-2xl p-6 text-center border-dashed backdrop-blur-sm transition-all hover:bg-black/30 hover:border-brand-base/50">
-            <input 
-              type="file" 
-              accept=".pdf,.docx" 
-              className="hidden" 
-              ref={fileInputRef}
-              onChange={handleFileUpload}
-            />
-            
-            {uploadState === "none" && (
-                <div 
-                  onClick={() => fileInputRef.current?.click()}
-                  className="cursor-pointer group"
-                >
-                    <div className="w-14 h-14 bg-brand-base/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-base/20 transition-all group-hover:scale-110">
-                        <Upload className="w-6 h-6 text-brand-light" />
-                    </div>
-                    <h3 className="text-sm font-semibold text-gray-200 mb-1">Got an existing script?</h3>
-                    <p className="text-xs text-gray-500">Upload a PDF or Word file to auto-import it</p>
-                </div>
-            )}
-            
-            {uploadState === "loading" && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center">
-                    <Loader2 className="w-10 h-10 text-brand-light animate-spin mb-4" />
-                    <p className="text-sm text-gray-400">Extracting and structuring text...</p>
-                </motion.div>
-            )}
-            
-            {uploadState === "success" && (
-                <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center">
-                    <div className="w-14 h-14 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                        <CheckCircle className="w-7 h-7 text-emerald-400" />
-                    </div>
-                    <p className="text-sm font-semibold text-emerald-400 mb-1">Script Extracted Successfully!</p>
-                    <p className="text-xs text-gray-500">{uploadName} will be automatically split into scenes.</p>
-                </motion.div>
-            )}
-            
-            {uploadState === "error" && (
-                <motion.div initial={{ x: [-10, 10, -10, 10, 0] }} transition={{ duration: 0.4 }} className="flex flex-col items-center cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                    <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <AlertCircle className="w-7 h-7 text-red-400" />
-                    </div>
-                    <p className="text-sm text-red-400 mb-1 font-semibold">Upload Failed</p>
-                    <p className="text-xs text-gray-500 hover:text-gray-300 transition-colors">Click to try another file</p>
-                </motion.div>
-            )}
+          <input
+            type="file"
+            accept=".pdf,.docx"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+          />
+
+          {uploadState === "none" && (
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="cursor-pointer group"
+            >
+              <div className="w-14 h-14 bg-brand-base/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-base/20 transition-all group-hover:scale-110">
+                <Upload className="w-6 h-6 text-brand-light" />
+              </div>
+              <h3 className="text-sm font-semibold text-gray-200 mb-1">Got an existing script?</h3>
+              <p className="text-xs text-gray-500">Upload a PDF or Word file to auto-import it</p>
+            </div>
+          )}
+
+          {uploadState === "loading" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center">
+              <Loader2 className="w-10 h-10 text-brand-light animate-spin mb-4" />
+              <p className="text-sm text-gray-400">Extracting and structuring text...</p>
+            </motion.div>
+          )}
+
+          {uploadState === "success" && (
+            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center">
+              <div className="w-14 h-14 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                <CheckCircle className="w-7 h-7 text-emerald-400" />
+              </div>
+              <p className="text-sm font-semibold text-emerald-400 mb-1">Script Extracted Successfully!</p>
+              <p className="text-xs text-gray-500">{uploadName} will be automatically split into scenes.</p>
+            </motion.div>
+          )}
+
+          {uploadState === "error" && (
+            <motion.div initial={{ x: [-10, 10, -10, 10, 0] }} transition={{ duration: 0.4 }} className="flex flex-col items-center cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+              <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="w-7 h-7 text-red-400" />
+              </div>
+              <p className="text-sm text-red-400 mb-1 font-semibold">Upload Failed</p>
+              <p className="text-xs text-gray-500 hover:text-gray-300 transition-colors">Click to try another file</p>
+            </motion.div>
+          )}
         </motion.div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
